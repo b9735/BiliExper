@@ -13,7 +13,7 @@ try:
 except:
     from json import loads
 
-main_version = (1, 2, 1)
+main_version = (1, 2, 2)
 main_version_str = '.'.join(map(str, main_version))
 
 def convertTimeString(time_string: str):
