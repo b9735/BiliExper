@@ -110,7 +110,11 @@ async def judgement_task(biliapi: asyncbili,
                                 logging.info(f'{biliapi.name}: 风纪委员成功为id为{case_id}的案件获取他人投票参数：{vote_text}')
                         else:
                             logging.warning(f'{biliapi.name}: 获取风纪委员案件他人投票结果异常，原因为{ret["message"]}，使用默认投票参数')
-
+                    
+                    initParams=params.copy()
+                    initParams["vote"]='0'
+                    await biliapi.juryVote(case_id, **initParams)
+                    
                     try:
                         await sleep(vote_cd)
                         ret = await biliapi.juryVote(case_id, **params) #将参数params展开后传参
