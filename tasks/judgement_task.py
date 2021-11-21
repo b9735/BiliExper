@@ -35,13 +35,9 @@ async def judgement_task(biliapi: asyncbili, task_config: dict) -> Awaitable:
         if info["data"]["apply_status"] == -1:
             ret = await biliapi.juryApply()
         return
-    remain_days = round( (info["data"]["term_end"]-time.time())/(60*60*24) )
-    logging.info(
-        f'{biliapi.name}: 拥有风纪委员身份，任期剩余{remain_days}天'
-    )
-    webhook.addMsg(
-        "msg_simple", f'{biliapi.name}:拥有风纪委员身份，任期剩余{remain_days}天\n'
-    )
+    remain_days = round((info["data"]["term_end"] - time.time()) / (60 * 60 * 24))
+    logging.info(f"{biliapi.name}: 拥有风纪委员身份，任期剩余{remain_days}天")
+    webhook.addMsg("msg_simple", f"{biliapi.name}:拥有风纪委员身份，任期剩余{remain_days}天\n")
 
     # 获取统计信息
     try:
@@ -127,7 +123,7 @@ async def judgement_task(biliapi: asyncbili, task_config: dict) -> Awaitable:
                                 my_vote = random.choice(vote_items)
                             else:
                                 my_vote = vote_items[vote_index]
-                            params["vote"] = vote_item["vote"]
+                            params["vote"] = my_vote["vote"]
                             logging.info(
                                 f"{biliapi.name}: 风纪委员成功为id为{case_id}的案件成功生成默认投票参数：{my_vote['vote_text']}"
                             )
@@ -149,7 +145,7 @@ async def judgement_task(biliapi: asyncbili, task_config: dict) -> Awaitable:
                             if ret["code"] == 0:
                                 opinions_current = ret["data"]["list"]
                                 if len(opinions_current) != 0:
-                                    opinions.append(opinions_current)
+                                    opinions.extend(opinions_current)
                                     if len(opinions_current) < 20:
                                         break
                                 else:
@@ -195,9 +191,7 @@ async def judgement_task(biliapi: asyncbili, task_config: dict) -> Awaitable:
                             params["vote"] = vote_items[0]["vote"]
                             info_text = f"{biliapi.name}: 风纪委员成功为id为{case_id}的案件获取他人投票参数：{vote_items[0]['vote_text']},众议观点:"
                             for item in vote_items:
-                                info_text += (
-                                    f"({vote_item['vote']} {vote_item['vote_text']}票),"
-                                )
+                                info_text += f"({item['vote_text']} {vote_dict[item['vote']]['count']}票),"
                             logging.info(info_text.rstrip(","))
                         else:
                             logging.warning(f"{biliapi.name}: 风纪委员案件未获取到众议观点，将使用默认投票参数")
@@ -205,7 +199,7 @@ async def judgement_task(biliapi: asyncbili, task_config: dict) -> Awaitable:
                     # 初始的空投票
                     initParams = params.copy()
                     initParams["vote"] = "0"
-                    biliapi.juryVote(case_id, **initParams)
+                    await biliapi.juryVote(case_id, **initParams)
                     # 真正的投票
                     try:
                         wait_time = vote_cd - (int(time.time()) - start_time)

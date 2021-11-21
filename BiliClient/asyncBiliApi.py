@@ -1460,11 +1460,12 @@ class asyncBiliApi(object):
     ) -> Awaitable[Dict[str, Any]]:
         """
         风纪委员投票
-        cid int 案件ID
+        case_id int 案件ID
         以下为可选参数，如果需要必须用参数名称的方式调用本函数
         vote int 投票类型
             case_type=4(弹幕氛围)时：11 好；12 普通；13 差；14 无法判断
         content str 理由
+        insiders int 平时是否观看此类视频 0 否； 1 是
         anonymous int 是否匿名 0 不匿名；1 匿名
         https://api.bilibili.com/x/credit/v2/jury/vote
         """
